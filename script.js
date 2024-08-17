@@ -1,6 +1,6 @@
 let xp = 0;
 let health = 100;
-let gold = 50;
+let gold = 250;
 let currentWeaponIndex = 0;
 let fighting;
 let monsterHealth;
@@ -86,14 +86,23 @@ function buyHealth() {
 }
 
 function buyWeapon() {
-  if (gold >= 30) {
-    gold -= 30;
-    currentWeaponIndex++;
-    goldText.innerText = gold;
-    
-    text.innerText = "You now have a new weapon.";
+  if (currentWeaponIndex < weapons.length - 1) {
+    if (gold >= 30) {
+      gold -= 30;
+      currentWeaponIndex++;
+      goldText.innerText = gold;
+      let newWeapon = weapons[currentWeaponIndex].name;
+      text.innerText = "You now have a " + newWeapon + ".";
+      inventory.push(newWeapon);
+      text.innerText += " In your inventory you have: " + inventory;
+    } else {
+      text.innerText = "You do not have enough gold to buy a weapon.";
+    }
+  } else {
+    text.innerText = "You already have the most powerful weapon!";
   }
 }
+
 
 function fightSlime() {
 
