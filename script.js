@@ -1,10 +1,10 @@
 let xp = 0;
 let health = 100;
 let gold = 50;
-let currentWeaponIndex = 0;
+let currentWeapon = 0;
 let fighting;
 let monsterHealth;
-let inventory = ["stick"];
+let inventory = ["Палка"];
 
 const button1 = document.querySelector('#button1');
 const button2 = document.querySelector("#button2");
@@ -17,70 +17,76 @@ const monsterStats = document.querySelector("#monsterStats");
 const monsterName = document.querySelector("#monsterName");
 const monsterHealthText = document.querySelector("#monsterHealth");
 const weapons = [
-  { name: 'stick', power: 5 },
-  { name: 'dagger', power: 30 },
-  { name: 'claw hammer', power: 50 },
-  { name: 'sword', power: 100 }
+  { name: 'Палка', power: 5 },
+  { name: 'Кинжал', power: 30 },
+  { name: 'Молот', power: 50 },
+  { name: 'Меч', power: 100 }
 ];
 const monsters = [
   {
-    name: "slime",
+    name: "Слизень",
     level: 2,
     health: 15
   },
   {
-    name: "fanged beast",
+    name: "Дикий зверь",
     level: 8,
     health: 60
   },
   {
-    name: "dragon",
+    name: "Дракон",
     level: 20,
     health: 300
   }
 ]
 const locations = [
   {
-    name: "town square",
-    "button text": ["Go to store", "Go to cave", "Fight dragon"],
+    name: "Городская площадь",
+    "button text": ["Пойти в магазин", "Пойти в пещеру", "Сразиться с драконом"],
     "button functions": [goStore, goCave, fightDragon],
-    text: "You are in the town square. You see a sign that says \"Store\"."
+    text: 'Вы находитесь на городской площади. Вы видите вывеску с надписью "Магазин".'
   },
   {
-    name: "store",
-    "button text": ["Buy 10 health (10 gold)", "Buy weapon (30 gold)", "Go to town square"],
+    name: "Магазин",
+    "button text": ["Купить 10 единиц здоровья (10 золотых)", "Купить оружие (30 золотых)", "Пойти на городскую площадь"],
     "button functions": [buyHealth, buyWeapon, goTown],
-    text: "You enter the store."
+    text: "Вы входите в магазин."
   },
   {
-    name: "cave",
-    "button text": ["Fight slime", "Fight fanged beast", "Go to town square"],
+    name: "Пещера",
+    "button text": ["Сразиться со слизью", "Сразиться с диким зверем", "Пойти на городскую площадь"],
     "button functions": [fightSlime, fightBeast, goTown],
-    text: "You enter the cave. You see some monsters."
+    text: "Вы входите в пещеру. Вы видите несколько монстров."
   },
   {
-    name: "fight",
-    "button text": ["Attack", "Dodge", "Run"],
+    name: "Битва",
+    "button text": ["Атака", "Уворот", "Бежать"],
     "button functions": [attack, dodge, goTown],
-    text: "You are fighting a monster."
+    text: "Вы сражаетесь с монстром."
   },
   {
-    name: "kill monster",
-    "button text": ["Go to town square", "Go to town square", "Go to town square"],
-    "button functions": [goTown, goTown, goTown],
-    text: 'The monster screams "Arg!" as it dies. You gain experience points and find gold.'
+    name: "Убить монстра",
+    "button text": ["Пойти на городскую площадь", "Пойти на городскую площадь", "Пойти на городскую площадь"],
+    "button functions": [goTown, goTown, easterEgg],
+    text: 'Умирая, монстр кричит "Арг!". Вы получаете очки опыта и находите золото.'
   },
   {
-    name: "lose",
-    "button text": ["REPLAY?", "REPLAY?", "REPLAY?"],
+    name: "Поражение",
+    "button text": ["ПОВТОРИТЬ?", "ПОВТОРИТЬ?", "ПОВТОРИТЬ?"],
     "button functions": [restart, restart, restart],
-    text: "You die. &#x2620;"
+    text: "Вы умерли. &#x2620;"
   },
   { 
-    name: "win", 
-    "button text": ["REPLAY?", "REPLAY?", "REPLAY?"], 
+    name: "Победа", 
+    "button text": ["ПОВТОРИТЬ?", "ПОВТОРИТЬ?", "ПОВТОРИТЬ?"], 
     "button functions": [restart, restart, restart], 
-    text: "You defeat the dragon! YOU WIN THE GAME! &#x1F389;" 
+    text: "Ты побеждаешь дракона! ТЫ  ПОБЕДИЛ! &#x1F389;" 
+  },
+  {
+    name: "Пасхальное яйцо",
+    "button text": ["2", "8", "Пойти на городскую площадь"],
+    "button functions": [pickTwo, pickEight, goTown],
+    text: "Вы нашли секретную игру. Выберите число, указанное выше. Случайным образом будут выбраны десять чисел в диапазоне от 0 до 10. Если выбранное вами число совпадает с одним из случайных чисел, вы выигрываете!"
   }
 ];
 
@@ -119,26 +125,26 @@ function buyHealth() {
     goldText.innerText = gold;
     healthText.innerText = health;
   } else {
-    text.innerText = "You do not have enough gold to buy health.";
+    text.innerText = "У вас недостаточно золота, чтобы купить здоровье.";
   }
 }
 
 function buyWeapon() {
-  if (currentWeaponIndex < weapons.length - 1) {
+  if (currentWeapon < weapons.length - 1) {
     if (gold >= 30) {
       gold -= 30;
-      currentWeaponIndex++;
+      currentWeapon++;
       goldText.innerText = gold;
-      let newWeapon = weapons[currentWeaponIndex].name;
-      text.innerText = "You now have a " + newWeapon + ".";
+      let newWeapon = weapons[currentWeapon].name;
+      text.innerText = "Теперь у вас есть " + newWeapon + ".";
       inventory.push(newWeapon);
-      text.innerText += " In your inventory you have: " + inventory;
+      text.innerText += " В вашем инвентаре хранится: " + inventory;
     } else {
-      text.innerText = "You do not have enough gold to buy a weapon.";
+      text.innerText = "У вас недостаточно золота, чтобы купить оружие.";
     }
   } else {
-    text.innerText = "You already have the most powerful weapon!";
-    button2.innerText = "Sell weapon for 15 gold";
+    text.innerText = "У вас уже есть самое мощное оружие!";
+    button2.innerText = "Продать оружие за 15 золотых";
     button2.onclick = sellWeapon;
   }
 }
@@ -148,10 +154,10 @@ function sellWeapon() {
     gold += 15;
     goldText.innerText = gold;
     let currentWeapon = inventory.shift();
-    text.innerText = "You sold a " + currentWeapon + ".";
-    text.innerText += " In your inventory you have: " + inventory;
+    text.innerText = "Вы продали " + currentWeapon + ".";
+    text.innerText += " В вашем инвентаре хранится: " + inventory;
   } else {
-    text.innerText = "Don't sell your only weapon!";
+    text.innerText = "Не продавай свое единственное оружие!";
   }
 }
 
@@ -179,13 +185,13 @@ function goFight() {
 }
 
 function attack() {
-  text.innerText = "The " + monsters[fighting].name + " attacks.";
-  text.innerText += " You attack it with your " + weapons[currentWeaponIndex].name + ".";
+  text.innerText = monsters[fighting].name + " вступает в бой.";
+  text.innerText += " Вы атакуете его своими " + weapons[currentWeapon].name + ".";
   health -= getMonsterAttackValue(monsters[fighting].level);
   if (isMonsterHit()) {
-    monsterHealth -= weapons[currentWeaponIndex].power + Math.floor(Math.random() * xp) + 1;    
+    monsterHealth -= weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;    
   } else {
-    text.innerText += " You miss.";
+    text.innerText += " Вы промахнулись.";
   }
   healthText.innerText = health;
   monsterHealthText.innerText = monsterHealth;
@@ -198,7 +204,10 @@ function attack() {
       defeatMonster();
     }
   }
-
+  if (Math.random() <= .1 && inventory.length !== 1) {
+    text.innerText += " Ваш " + inventory.pop() + " сломался.";
+    currentWeapon--;
+  }
 }
 
 function getMonsterAttackValue(level) {
@@ -212,7 +221,7 @@ function isMonsterHit() {
 }
 
 function dodge() {
-  text.innerText = "You dodge the attack from the " + monsters[fighting].name;
+  text.innerText = "Вы уклоняетесь от атаки со стороны " + monsters[fighting].name;
 }
 
 function defeatMonster() {
@@ -235,10 +244,47 @@ function restart() {
   xp = 0;
   health = 100;
   gold = 50;
-  currentWeaponIndex = 0;
-  inventory = ["stick"];
+  currentWeapon = 0;
+  inventory = ["Палка"];
   goldText.innerText = gold;
   healthText.innerText = health;
   xpText.innerText = xp;
   goTown();
+}
+
+function easterEgg() {
+  update(locations[7]);
+}
+
+function pickTwo() {
+  pick(2);
+}
+
+function pickEight() {
+  pick(8);
+}
+
+function pick(guess) {
+  const numbers = [];
+  while (numbers.length < 10) {
+    numbers.push(Math.floor(Math.random() * 11));
+  }
+  text.innerText = "Ты выбрал " + guess + ". Вот случайные числа:\n";
+  for (let i = 0; i < 10; i++) {
+    text.innerText += numbers[i] + "\n";
+  }
+  if (numbers.includes(guess)) {
+    text.innerText += "Правильно! Вы выигрываете 20 золотых монет!";
+    gold += 20;
+    goldText.innerText = gold;
+    update(locations[0]);
+  } else {
+    text.innerText += "Неправильно! Вы теряете 10 единиц здоровья!";
+    health -= 10;
+    healthText.innerText = health;
+    if (health <= 0) {
+      lose();
+    }
+    update(locations[0]);
+  }
 }
